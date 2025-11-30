@@ -2,10 +2,13 @@ package handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rag.EmbeddingService;
 import rag.RagService;
 import utils.PropertiesLoader;
 
+import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -13,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class KaczmarskiBotTests {
 
+    private static final Logger logger = LoggerFactory.getLogger(KaczmarskiBotTests.class);
     private KaczmarskiGPTHandler handler;
     private String apiKey;
 
@@ -20,15 +24,17 @@ public class KaczmarskiBotTests {
     void setUp() {
         Properties config = PropertiesLoader.load("config.properties");
         apiKey = config.getProperty("openai.api.key");
-        assertNotNull(apiKey, "Nie znaleziono openai.api.key w config.properties!");
+        assertNotNull(apiKey, "Openai.api.key in config.properties wasn't found!");
 
         EmbeddingService embeddingService = new EmbeddingService(apiKey);
         RagService ragService = new RagService(embeddingService);
         try {
             ragService.getStore().loadFromJson("src/main/resources/embeddings.json");
-        } catch (Exception e) {
+            handler = new KaczmarskiGPTHandler(apiKey, ragService);
+        } catch (IOException e) {
+            logger.error("Failed to load embeddings from JSON", e);
+            throw new RuntimeException("Unable to initialize KaczmarskiGPTHandler", e);
         }
-        handler = new KaczmarskiGPTHandler(apiKey, ragService);
     }
 
     @Test
@@ -40,10 +46,10 @@ public class KaczmarskiBotTests {
         long end = System.nanoTime();
 
         long elapsedMillis = (end - start) / 1_000_000;
-        System.out.println("Czas odpowiedzi bota: " + elapsedMillis + " ms");
+        System.out.println("Time that bot took to reply: " + elapsedMillis + " ms");
 
         assertNotNull(response);
-        assertFalse(response.trim().isEmpty(), "Odpowiedź nie może być pusta");
+        assertFalse(response.trim().isEmpty(), "Response can't be blank");
     }
 
     @Test
@@ -70,35 +76,32 @@ public class KaczmarskiBotTests {
         String response2 = result2.get(30, TimeUnit.SECONDS);
         String response3 = result3.get(30, TimeUnit.SECONDS);
 
+        assertNotNull(response1, "Response for chatId1 can't be null");
+        assertNotNull(response2, "Response for chatId2 can't be null");
+        assertNotNull(response3, "Response for chatId3 can't be null");
 
-        assertNotNull(response1, "Odpowiedź dla chatId1 nie może być null");
-        assertNotNull(response2, "Odpowiedź dla chatId2 nie może być null");
-        assertNotNull(response3, "Odpowiedź dla chatId3 nie może być null");
-
-
-        assertTrue(handler.chatHistoryContains(chatId1, prompt1), 
-                "Historia chatId1 powinna zawierać prompt1");
-        assertTrue(handler.chatHistoryContains(chatId2, prompt2), 
-                "Historia chatId2 powinna zawierać prompt2");
+        assertTrue(handler.chatHistoryContains(chatId1, prompt1),
+                "History of chatId1 should include prompt1");
+        assertTrue(handler.chatHistoryContains(chatId2, prompt2),
+                "History of chatId2 should include prompt2");
         assertTrue(handler.chatHistoryContains(chatId3, prompt3),
-                "Historia chatId3 powinna zawierać prompt3");
+                "History of chatId3 should include prompt3");
 
         int historySize1 = handler.getChatHistorySize(chatId1);
         int historySize2 = handler.getChatHistorySize(chatId2);
         int historySize3 = handler.getChatHistorySize(chatId3);
 
-        assertTrue(historySize1 > 0, "ChatId1 powinien mieć historię");
-        assertTrue(historySize2 > 0, "ChatId2 powinien mieć historię");
-        assertTrue(historySize3 > 0, "ChatId3 powinien mieć historię");
+        assertTrue(historySize1 > 0, "ChatId1 should have history");
+        assertTrue(historySize2 > 0, "ChatId2 should have history");
+        assertTrue(historySize3 > 0, "ChatId3 should have history");
 
-
-        assertFalse(handler.chatHistoryContains(chatId2, prompt1), 
-                "Historie rozmów nie powinny się mieszać - chatId2 nie powinien mieć prompt1");
-        assertFalse(handler.chatHistoryContains(chatId1, prompt2), 
-                "Historie rozmów nie powinny się mieszać - chatId1 nie powinien mieć prompt2");
+        assertFalse(handler.chatHistoryContains(chatId2, prompt1),
+                "Chat histories must not mix — chatId2 should not contain prompt1");
+        assertFalse(handler.chatHistoryContains(chatId1, prompt2),
+                "Chat histories must not mix — chatId1 should not contain prompt2");
         assertFalse(handler.chatHistoryContains(chatId1, prompt3),
-                "Historie rozmów nie powinny się mieszać - chatId1 nie powinien mieć prompt3");
+                "Chat histories must not mix — chatId1 should not contain prompt3");
         pool.shutdown();
-        assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS), "Executor powinien się zamknąć");
+        assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS), "Executor should be closed");
     }
 }
