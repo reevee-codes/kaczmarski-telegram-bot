@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Implementacja serwisu generującego embeddingi tekstowe przez OpenAI API.
- */
 public class EmbeddingService implements IEmbeddingService {
     private static final String OPENAI_URL = "https://api.openai.com/v1/embeddings";
     private final String apiKey;

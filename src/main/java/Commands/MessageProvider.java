@@ -36,18 +36,9 @@ public class MessageProvider {
         public static final String WELCOME = "chat.welcome";
         public static final String GOODBYE = "chat.goodbye";
         public static final String ERROR_PROCESSING = "chat.error.processing";
-        public static final String UNKNOWN_COMMAND = "chat.unknown.command";
-        public static final String PHOTO_CAPTION = "photo.caption";
-        public static final String EASTER_EGG_STARA = "easteregg.stara";
-
-        public static final String ERROR_UNKNOWN_COMMAND_TYPE = "error.unknown.command.type";
-        public static final String ERROR_CONFIG_NOT_FOUND = "error.config.not.found";
         public static final String ERROR_SEND_MESSAGE_FAILED = "error.send.message.failed";
-        public static final String ERROR_EXECUTE_ACTION_FAILED = "error.execute.action.failed";
-
         public static final String LOG_CHAT_STARTED = "log.chat.started";
         public static final String LOG_CHAT_ENDED = "log.chat.ended";
-        public static final String LOG_MESSAGE_RECEIVED = "log.message.received";
         public static final String LOG_GPT_RESPONSE = "log.gpt.response";
         public static final String LOG_ACTIVE_CHAT_HANDLED = "log.active.chat.handled";
     }

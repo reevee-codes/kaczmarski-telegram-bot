@@ -8,10 +8,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Set;
 
-/**
- * Implementacja serwisu RAG (Retrieval-Augmented Generation) do wyszukiwania
- * najbardziej podobnych fragmentów tekstu na podstawie embeddingów.
- */
 public class RagService implements IRagService {
     private static final Logger logger = LoggerFactory.getLogger(RagService.class);
     

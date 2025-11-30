@@ -154,10 +154,6 @@ public class KaczmarskiGPTHandler {
         }
     }
 
-    /**
-     * Sprawdza czy historia rozmowy dla danego chatId zawiera podany tekst.
-     * Metoda pomocnicza do testów.
-     */
     public boolean chatHistoryContains(long chatId, String text) {
         List<ChatMessage> messages = chatHistories.get(chatId);
         if (messages == null) {
@@ -167,10 +163,6 @@ public class KaczmarskiGPTHandler {
                 .anyMatch(msg -> msg.getContent() != null && msg.getContent().contains(text));
     }
 
-    /**
-     * Zwraca liczbę wiadomości w historii dla danego chatId.
-     * Metoda pomocnicza do testów.
-     */
     public int getChatHistorySize(long chatId) {
         List<ChatMessage> messages = chatHistories.get(chatId);
         return messages != null ? messages.size() : 0;

@@ -18,10 +18,6 @@ public class VectorStore {
         chunks.add(chunk);
     }
 
-    public List<TextChunk> getChunks() {
-        return chunks;
-    }
-
     public void loadFromJson(String path) throws IOException {
         Gson gson = new Gson();
         Type listType = new TypeToken<List<TextChunk>>() {}.getType();

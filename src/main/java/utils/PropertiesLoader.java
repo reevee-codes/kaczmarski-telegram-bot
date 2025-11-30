@@ -15,7 +15,6 @@ public class PropertiesLoader {
             if (input == null) {
                 throw new RuntimeException(fileName + " file not found");
             }
-            // Użyj UTF-8 zamiast domyślnego kodowania
             props.load(new InputStreamReader(input, StandardCharsets.UTF_8));
             return props;
         } catch (IOException e) {
